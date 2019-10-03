@@ -7,6 +7,7 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
+#include <morphio/version.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -45,7 +46,7 @@ static void writeLine(std::ofstream& myfile, int id, int parentId, SectionType t
 
 static std::string version_footnote()
 {
-    return std::string("Created by MorphIO v") + morphio::VERSION;
+    return std::string("Created by MorphIO v") + getVersionString();
 }
 
 /**
@@ -73,14 +74,14 @@ void swc(const Morphology& morphology, const std::string& filename)
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& soma_points = soma->points();
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty())
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile, segmentIdOnDisk, i == 0 ? -1 : segmentIdOnDisk - 1,
@@ -158,7 +159,7 @@ void asc(const Morphology& morphology, const std::string& filename)
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -172,7 +173,7 @@ void asc(const Morphology& morphology, const std::string& filename)
         myfile << ")\n\n";
     } else {
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (auto& section : morphology.rootSections()) {
@@ -247,10 +248,11 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
         structure.push_back({s._sections[i][0], s._sections[i][1]});
     }
 
-    HighFive::Group g_mitochondria = h5_file.createGroup("mitochondria");
+    HighFive::Group g_organelles = h5_file.createGroup("organelles");
+    HighFive::Group g_mitochondria = g_organelles.createGroup("mitochondria");
 
-    write_dataset(g_mitochondria, "/mitochondria/points", points);
-    write_dataset(h5_file, "/mitochondria/structure", structure);
+    write_dataset(g_mitochondria, "points", points);
+    write_dataset(g_mitochondria, "structure", structure);
 }
 
 void h5(const Morphology& morpho, const std::string& filename)
@@ -272,9 +274,9 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     if (numberOfSomaPoints < 1)
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     if (numberOfSomaPoints != numberOfSomaDiameters)
-        throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+        throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", numberOfSomaPoints, "soma diameters",
             numberOfSomaDiameters));
 
@@ -316,7 +318,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints)
                 throw WriterError(
-                    plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                    readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                         "points", numberOfPoints, "perimeters",
                         numberOfPerimeters));
             for (unsigned int i = 0; i < numberOfPerimeters; ++i)

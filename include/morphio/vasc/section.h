@@ -1,4 +1,6 @@
 #pragma once
+#include <memory> // std::shared_ptr
+#include <vector> // std::vector
 
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>

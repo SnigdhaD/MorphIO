@@ -1,22 +1,26 @@
 #pragma once
+#include <memory> // std::unique_ptr
+#include <string> // std::string
+#include <vector> // std::vector
 
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/errorMessages.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/H5Utility.hpp>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace h5 {
 Property::Properties load(const URI& uri);
 
 class MorphologyHDF5
 {
 public:
+    MorphologyHDF5(const std::string& uri) : _err(uri), _uri(uri){}
     virtual ~MorphologyHDF5();
-    Property::Properties load(const URI& uri);
+    Property::Properties load();
 
 private:
     void _checkVersion(const std::string& source);
@@ -30,10 +34,13 @@ private:
     void _readSectionTypes();
     void _readPerimeters(int);
     void _readMitochondria();
+
     template <typename T>
-    void _read(const std::string& group, const std::string& _dataset,
-        MorphologyVersion version, unsigned int expectedDimension,
-        T& data);
+    void _read(const std::string& group,
+               const std::string& _dataset,
+               MorphologyVersion version,
+               unsigned int expectedDimension,
+               T& data);
 
     std::unique_ptr<HighFive::File> _file;
 
@@ -46,7 +53,9 @@ private:
     std::string _stage;
     Property::Properties _properties;
     bool _write;
+    ErrorMessages _err;
+    std::string _uri;
 };
 } // namespace h5
-} // namespace plugin
+} // namespace readers
 } // namespace morphio

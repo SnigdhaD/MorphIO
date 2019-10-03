@@ -1,39 +1,39 @@
 set(MORPHIO_SOURCES
-        morphology.cpp
-  plugin/morphologyHDF5.cpp
-  plugin/morphologySWC.cpp
-  plugin/morphologyASC.cpp
-        plugin/vasculatureHDF5.cpp
-  mitochondria.cpp
-  errorMessages.cpp
-  mito_section.cpp
-  mito_iterators.cpp
-  properties.cpp
-  iterators.cpp
-  morphology.cpp
-  soma.cpp
-  section.cpp
-  vasc/section.cpp
-  vasc/vasculature.cpp
-  vasc/properties.cpp
-  vector_utils.cpp
-  version.cpp
-  mut/mito_iterators.cpp
-  mut/mito_section.cpp
-  mut/iterators.cpp
-  mut/section.cpp
-  mut/soma.cpp
-  mut/morphology.cpp
-  mut/mitochondria.cpp
-  mut/writers.cpp
-  mut/modifiers.cpp)
+    enums.cpp
+    errorMessages.cpp
+    mito_section.cpp
+    mitochondria.cpp
+    morphology.cpp
+    morphology.cpp
+    properties.cpp
+    section.cpp
+    soma.cpp
+    vector_utils.cpp
+    version.cpp
+    mut/mito_section.cpp
+    mut/section.cpp
+    mut/soma.cpp
+    mut/morphology.cpp
+    mut/mitochondria.cpp
+    mut/writers.cpp
+    mut/modifiers.cpp
+    readers/morphologyHDF5.cpp
+    readers/morphologySWC.cpp
+    readers/morphologyASC.cpp
+    readers/vasculatureHDF5.cpp
+    vasc/section.cpp
+    vasc/vasculature.cpp
+    vasc/properties.cpp
+    )
 
-execute_process(COMMAND python setup.py --version
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                RESULT_VARIABLE PY_VERSION_FAILED
-                OUTPUT_VARIABLE MORPHIO_VERSION_STRING
-                ERROR_VARIABLE PY_VERSION_ERROR
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT MORPHIO_VERSION_STRING)
+    execute_process(COMMAND git describe --tags
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_VERSION_FAILED
+                    OUTPUT_VARIABLE MORPHIO_VERSION_STRING
+                    ERROR_VARIABLE GIT_VERSION_ERROR
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
 configure_file (
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in

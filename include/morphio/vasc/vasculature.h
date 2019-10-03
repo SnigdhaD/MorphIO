@@ -1,24 +1,31 @@
 #pragma once
 
-#include <memory>
+#include <memory> // std::shared_ptr
+#include <string> // std::string
+#include <vector> // std::vector
+
 #include <morphio/types.h>
+#include <morphio/vasc/iterators.hpp>
 #include <morphio/vasc/properties.h>
 
 namespace morphio {
 namespace vasculature {
+
+using graph_iterator = graph_iterator_t<Section, Vasculature>;
+
 class Vasculature
 {
 public:
-    virtual ~Vasculature();
-
-    Vasculature& operator=(const Vasculature&);
-    Vasculature(Vasculature&&);
-    Vasculature& operator=(Vasculature&&);
-
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
      */
     explicit Vasculature(const std::string& source);
+
+    Vasculature(Vasculature&&) = default;
+    virtual ~Vasculature() {}
+
+    Vasculature& operator=(const Vasculature&) = default;
+    Vasculature& operator=(Vasculature&&) = default;
 
     /**
      * Return a vector containing all section objects.

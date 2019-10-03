@@ -40,6 +40,7 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
+                      '-DMORPHIO_VERSION_STRING=' + self.distribution.get_version(),
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -60,10 +61,8 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         try:
-            output = subprocess.check_call([cmake, ext.sourcedir] + cmake_args,
-                                           cwd=self.build_temp)
-            output = subprocess.check_call([cmake, '--build', '.'] + build_args,
-                                           cwd=self.build_temp)
+            subprocess.check_call([cmake, ext.sourcedir] + cmake_args, cwd=self.build_temp)
+            subprocess.check_call([cmake, '--build', '.', '--target', 'morphio'] + build_args, cwd=self.build_temp)
         except subprocess.CalledProcessError as exc:
             print("Status : FAIL", exc.returncode, exc.output)
             raise

@@ -18,9 +18,9 @@ void set_maximum_warnings(int n_warnings)
 void set_ignored_warning(Warning warning, bool ignore)
 {
     if (ignore)
-        plugin::_ignoredWarnings.insert(warning);
+        readers::_ignoredWarnings.insert(warning);
     else
-        plugin::_ignoredWarnings.erase(warning);
+        readers::_ignoredWarnings.erase(warning);
 }
 
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore)
@@ -32,7 +32,7 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore)
 void LBERROR(Warning warning, const std::string& msg)
 {
     static int error = 0;
-    if (plugin::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
+    if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
 
     if (MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
@@ -52,7 +52,7 @@ void LBERROR(Warning warning, const std::string& msg)
     }
 }
 
-namespace plugin {
+namespace readers {
 bool ErrorMessages::isIgnored(Warning warning)
 {
     return _ignoredWarnings.find(warning) != _ignoredWarnings.end();
@@ -83,6 +83,13 @@ const std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned in
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
                     "Unsupported section type: " + std::to_string(type));
+}
+
+const std::string ErrorMessages::ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
+                                                                        const VascularSectionType& type) const
+{
+    return errorMsg(lineNumber, ErrorLevel::ERROR,
+                            "Unsupported section type: " + std::to_string(type));
 }
 
 const std::string ErrorMessages::ERROR_MULTIPLE_SOMATA(
@@ -349,6 +356,6 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
     return msg;
 }
 
-} // namespace plugin
+} // namespace readers
 
 } // namespace morphio

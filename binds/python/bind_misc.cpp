@@ -8,6 +8,7 @@
 #include <morphio/types.h>
 #include <morphio/enums.h>
 #include <morphio/tools.h>
+#include <morphio/version.h>
 
 #include "bind_enums.h"
 
@@ -16,14 +17,14 @@ namespace py = pybind11;
 static void bind_misc(py::module &m) {
     using namespace py::literals;
 
-  m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
-        "Set the maximum number of warnings to be printed on screen\n"
-        "0 will print no warning\n"
-        "-1 will print them all");
-  m.def("set_ignored_warning", static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
-        "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
-  m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
-        "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
+    m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
+          "Set the maximum number of warnings to be printed on screen\n"
+          "0 will print no warning\n"
+          "-1 will print them all");
+    m.def("set_ignored_warning", static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
+          "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
+    m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
+          "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
 
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
@@ -49,6 +50,17 @@ static void bind_misc(py::module &m) {
         .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
         // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
         // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
+        .export_values();
+
+    py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")
+        .value("undefined", morphio::enums::VascularSectionType::SECTION_NOT_DEFINED)
+        .value("vein", morphio::enums::VascularSectionType::SECTION_VEIN)
+        .value("artery", morphio::enums::VascularSectionType::SECTION_ARTERY)
+        .value("venule", morphio::enums::VascularSectionType::SECTION_VENULE)
+        .value("arteriole", morphio::enums::VascularSectionType::SECTION_ARTERIOLE)
+        .value("venous_capillary", morphio::enums::VascularSectionType::SECTION_VENOUS_CAPILLARY)
+        .value("arterial_capillary", morphio::enums::VascularSectionType::SECTION_ARTERIAL_CAPILLARY)
+        .value("transitional", morphio::enums::VascularSectionType::SECTION_TRANSITIONAL)
         .export_values();
 
     py::enum_<morphio::enums::Option>(m, "Option", py::arithmetic())
@@ -109,7 +121,7 @@ static void bind_misc(py::module &m) {
         .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
-    m.attr("version") = morphio::VERSION;
+    m.attr("version") = morphio::getVersionString();
 
     auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
     // base.ptr() signifies "inherits from"
@@ -215,6 +227,4 @@ static void bind_misc(py::module &m) {
         .def(py::init<std::vector<uint32_t>, std::vector<float>,
              std::vector<morphio::Property::Diameter::Type>>(),
              "neuronal_section_ids"_a, "distances_to_section_start"_a, "diameters"_a);
-
-    m.doc() = "pybind11 example plugin"; // optional module docstring
 }

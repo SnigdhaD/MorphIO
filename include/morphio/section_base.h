@@ -1,6 +1,9 @@
 #pragma once
 
-#include <morphio/iterators.h>
+#include <cstdint> // uint32_t
+#include <memory> // std::shared_ptr
+#include <vector> // std::vector
+
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
@@ -21,7 +24,11 @@ template <typename T>
 class SectionBase
 {
 public:
-    SectionBase(const SectionBase& section);
+    SectionBase()
+    : _id(0)
+    {}
+
+    explicit SectionBase(const SectionBase& section);
 
     const SectionBase& operator=(const SectionBase& section);
 
@@ -49,7 +56,7 @@ public:
     uint32_t id() const;
 
 protected:
-    SectionBase(uint32_t id, std::shared_ptr<Property::Properties> morphology);
+    SectionBase(uint32_t id, std::shared_ptr<Property::Properties> properties);
     template <typename Property>
     const range<const typename Property::Type> get() const;
 

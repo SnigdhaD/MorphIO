@@ -5,7 +5,6 @@
 
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
-#include <morphio/mut/iterators.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
@@ -21,7 +20,7 @@ void _appendProperties(Property::PointLevel& to,
 void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     std::shared_ptr<Section> section);
 
-using morphio::plugin::ErrorMessages;
+using morphio::readers::ErrorMessages;
 Morphology::Morphology(const morphio::URI& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options))
 {
@@ -260,12 +259,12 @@ void _appendProperties(Property::PointLevel& to,
 
 void Morphology::sanitize()
 {
-    sanitize(morphio::plugin::DebugInfo());
+    sanitize(morphio::readers::DebugInfo());
 }
 
-void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
+void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo)
 {
-    morphio::plugin::ErrorMessages err(debugInfo._filename);
+    morphio::readers::ErrorMessages err(debugInfo._filename);
 
     auto it = depth_begin();
     while (it != depth_end()) {

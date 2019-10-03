@@ -1,8 +1,9 @@
 #pragma once
 
-#include <string>
-
-// #include "morphologySWC.h"
+#include <map> // std::map
+#include <memory> // std::shared_ptr
+#include <set> // std::set
+#include <string> // std::string
 
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/section.h>
@@ -18,7 +19,7 @@ void set_ignored_warning(const std::vector<Warning>& warning,
 
 void LBERROR(Warning warning, const std::string& msg);
 
-namespace plugin {
+namespace readers {
 enum ErrorLevel
 {
     INFO,
@@ -132,6 +133,9 @@ public:
     const std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
                                                      const SectionType& type) const;
 
+    const std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
+                                                                 const VascularSectionType& type) const;
+
     const std::string ERROR_MULTIPLE_SOMATA(
         const std::vector<Sample>& somata) const;
 
@@ -213,6 +217,6 @@ private:
     std::string _uri;
 };
 
-} // namespace plugin
+} // namespace readers
 
 } // namespace morphio
